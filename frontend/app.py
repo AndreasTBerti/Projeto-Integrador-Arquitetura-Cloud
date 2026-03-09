@@ -9,7 +9,7 @@ def main() -> None:
 class Frontend():
 
     def __init__(self):
-        self.API_URL = "http://localhost:8000/analyze"
+        self.API_URL = "https://pi-cloud.onrender.com"
         
         st.title("DataViewer")
 
