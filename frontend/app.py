@@ -21,7 +21,7 @@ class Frontend():
 
     def data_mapping(self, file) -> None:
 
-        df = pl.read_csv(file)
+        df = pl.read_csv(file, separator=",")
 
         columns = df.columns
         st.write("Colunas encontradas:", columns)

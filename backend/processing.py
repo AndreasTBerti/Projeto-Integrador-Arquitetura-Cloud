@@ -23,8 +23,19 @@ def apply_data_mapping(df: pl.DataFrame, mapping: dict) -> pl.DataFrame:
 
 def analisar_dados(df: pl.DataFrame) -> dict:
 
+    #primeiro filtro - retirar caracteres
     df = df.with_columns(
-        pl.col("data").str.strptime(pl.Date, "%Y-%m-%d")
+        pl.all().str.strip_chars()
+    )
+
+    #segundo filtro - data
+    df = df.with_columns(
+        pl.col("data").str.strptime(pl.Date, "%y-%m-%d")
+    )
+
+    #terceiro filtro - precipitação
+    df = df.with_columns(
+        pl.col("precipitacao_mm").cast(pl.Float64)
     )
 
     total = df["precipitacao_mm"].sum()
@@ -41,4 +52,4 @@ def analisar_dados(df: pl.DataFrame) -> dict:
     }
 
 if __name__ == "__main__":
-    analisar_dados()
+    pass
