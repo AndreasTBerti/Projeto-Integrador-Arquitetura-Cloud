@@ -4,7 +4,7 @@ from requests import post
 import streamlit as st
 
 def main() -> None:
-    frontend = Frontend()
+    Frontend()
 
 class Frontend():
 
@@ -21,6 +21,7 @@ class Frontend():
 
     def data_mapping(self, file) -> None:
 
+        file.seek(0)
         df = pl.read_csv(file, separator=",")
 
         columns = df.columns
@@ -47,6 +48,8 @@ class Frontend():
 
         if st.button("Analisar dados"):
 
+            file.seek(0)
+
             files = {
                 "file": (file.name, file.getvalue(), "text/csv")
             }
@@ -55,46 +58,51 @@ class Frontend():
                 "mapping": json.dumps(mapping)
             }
 
-            response = post(
-                self.API_URL,
-                files=files,
-                data=data
-            )
+            try:
 
-            if response.status_code == 200:
-
-                result = response.json()
-
-                stats = result["estatisticas"]
-
-                st.subheader("Resultados da análise")
-
-                col1, col2 = st.columns(2)
-
-                col1.metric(
-                    "Total de precipitação",
-                    f"{stats['total_precipitacao']:.2f} mm"
+                response = post(
+                    self.API_URL,
+                    files=files,
+                    data=data
                 )
 
-                col2.metric(
-                    "Média de precipitação",
-                    f"{stats['media_precipitacao']:.2f} mm"
-                )
+                if response.status_code == 200:
 
-                col1.metric(
-                    "Desvio padrão",
-                    f"{stats['desvio_padrao']:.2f}"
-                )
+                    result = response.json()
 
-                col2.metric(
-                    "Dias secos",
-                    stats["dias_secos"]
-                )
+                    stats = result["estatisticas"]
 
-            else:
+                    st.subheader("Resultados da análise")
 
-                st.error("Erro ao processar os dados.")
+                    col1, col2 = st.columns(2)
 
+                    col1.metric(
+                        "Total de precipitação",
+                        f"{stats['total_precipitacao']:.2f} mm"
+                    )
+
+                    col2.metric(
+                        "Média de precipitação",
+                        f"{stats['media_precipitacao']:.2f} mm"
+                    )
+
+                    col1.metric(
+                        "Desvio padrão",
+                        f"{stats['desvio_padrao']:.2f}"
+                    )
+
+                    col2.metric(
+                        "Dias secos",
+                        stats["dias_secos"]
+                    )
+
+                else:
+
+                    st.error("Erro ao processar os dados.")
+                    st.error(response.text)
+
+            except Exception as e:
+                st.error(str(e))
 
 if __name__ == "__main__":
     main()
