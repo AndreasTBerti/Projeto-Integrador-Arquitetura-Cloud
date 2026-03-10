@@ -11,7 +11,11 @@ class Frontend():
     def __init__(self):
         self.API_URL = "https://pi-cloud.onrender.com/analyze"
         
-        st.title("DataViewer")
+        st.set_page_config(
+            page_title="ClimateDataViewer",
+            page_icon="📊",
+            layout="wide"
+        )
 
         file = st.file_uploader("Envie o CSV", type="csv")
 
@@ -32,19 +36,28 @@ class Frontend():
         options = [
             "Ignorar",
             "Data",
-            "Precipitacao",
+            "Precipitação",
             "Temperatura",
         ]
 
-        for col in columns:
+        with st.container(border=True):
+            st.subheader("Mapeamento de colunas")
 
-            selected = st.selectbox(
-                f"O que representa a coluna '{col}'?",
-                options,
-                key=col
-            )
+            col1, col2 = st.columns(2)
 
-            mapping[col] = selected
+            for i, col in enumerate(columns):
+
+                target = col1 if i % 2 == 0 else col2
+
+                with target:
+                    selected = st.selectbox(
+                        f"Coluna '{col}' representa:",
+                        options,
+                        key=f"map_{col}_{i}"
+                    )
+
+                mapping[col] = selected
+
 
         if st.button("Analisar dados"):
 
@@ -74,25 +87,25 @@ class Frontend():
 
                     st.subheader("Resultados da análise")
 
-                    col1, col2 = st.columns(2)
+                    c1, c2, c3, c4 = st.columns(4)
 
-                    col1.metric(
-                        "Total de precipitação",
+                    c1.metric(
+                        "🌧 Total precipitação",
                         f"{stats['total_precipitacao']:.2f} mm"
                     )
 
-                    col2.metric(
-                        "Média de precipitação",
+                    c2.metric(
+                        "📊 Média",
                         f"{stats['media_precipitacao']:.2f} mm"
                     )
 
-                    col1.metric(
-                        "Desvio padrão",
-                        f"{stats['desvio_padrao']:.2f}"
+                    c3.metric(
+                        "📉 Desvio padrão",
+                        f"{stats['desvio_padrao_precipitacao']:.2f}"
                     )
 
-                    col2.metric(
-                        "Dias secos",
+                    c4.metric(
+                        "☀ Dias secos",
                         stats["dias_secos"]
                     )
 
