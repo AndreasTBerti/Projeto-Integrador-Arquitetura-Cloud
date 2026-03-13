@@ -96,25 +96,12 @@ class Frontend():
             #tentar:
             try:
 
-                #envia dados para a API
-                response = post(
-                    self.API_URL,
-                    files=files,
-                    data=data
-                )
+                response = self.comunicar_com_API(files=files, data=data)
 
                 #se houver resposta positiva, exibir os dados
                 if response.status_code == 200:
 
-                    result = response.json()
-
-                    precipitacao_stats = result["precipitacao"]
-                    temperatura_stats = result["temperatura"]
-
-                    st.subheader("Resultados da análise")
-
-                    self.exibir_dados_precipitacao(stats=precipitacao_stats)
-                    self.exibir_dados_temperatura_média(stats=temperatura_stats)
+                    self.resultados_da_analise(response=response)
 
                 #senão, apontar erro
                 else:
@@ -124,6 +111,36 @@ class Frontend():
 
             except Exception as e:
                 st.error(str(e))
+
+    #envia e recebe resposta da API
+    def comunicar_com_API(self, files, data):
+        #envia dados para a API
+        response = post(
+            self.API_URL,
+            files=files,
+            data=data
+        )
+
+        return response
+
+    #função que reune e exibe os resultados recebidos da API
+    def resultados_da_analise(self, response):
+        result = response.json()
+
+        precipitacao_stats = result["precipitacao"]
+        temperatura_stats = result["temperatura"]
+        dados_mensais = result["dados_mensais"]
+
+        st.subheader("Resultados da análise")
+
+        if precipitacao_stats:
+            self.exibir_dados_precipitacao(stats=precipitacao_stats)
+
+        if temperatura_stats:
+            self.exibir_dados_temperatura_média(stats=temperatura_stats)
+
+        if dados_mensais:
+            self.exibir_dados_por_mes(stats=dados_mensais)
 
     #função para exibir dados de precipitação
     def exibir_dados_precipitacao(self, stats):
@@ -172,6 +189,14 @@ class Frontend():
             "📉 Desvio padrão temperatura",
             f"{stats['desvio_padrao_temperatura']:.2f}"
         )
+
+    #função que exibe gráfico com dados mensais
+    def exibir_dados_por_mes(self, stats):
+        df_mensal = pl.DataFrame(stats)
+        
+        st.subheader("Dados Mensais")
+
+        st.dataframe(df_mensal)
 
 
 if __name__ == "__main__":

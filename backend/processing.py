@@ -18,8 +18,6 @@ def apply_data_mapping(df: pl.DataFrame, mapping: dict) -> pl.DataFrame:
 
     df = df.rename(rename_dict)
 
-    df = filter_data_frame(df)
-
     return df
 
 
@@ -31,7 +29,7 @@ def filter_data_frame(df: pl.DataFrame) -> pl.DataFrame:
 
     #segundo filtro - data
     df = df.with_columns(
-        pl.col("data").str.strptime(pl.Date, "%y-%m-%d")
+        pl.col("data").str.strptime(pl.Date, "%Y-%m-%d")
     )
 
     #terceiro filtro - precipitação
@@ -70,7 +68,32 @@ def analisar_dados_temperatura(df: pl.DataFrame) -> dict:
         "temperatura_maxima": max_temp
     }
 
+def analisar_por_mes(df: pl.DataFrame) -> list:
 
+    df = df.with_columns(
+        pl.col("data").dt.month().alias("mes")
+    )
+
+    aggs: list = []
+
+    if "precipitacao" in df.columns:
+        aggs.append = [
+            pl.col("precipitacao_mm").sum().alias("total_precipitacao"),
+            pl.col("precipitacao_mm").mean().alias("media_precipitacao")
+        ]
+
+    if "temperatura" in df.columns:
+        aggs.append(
+            pl.col("temperatura").mean().alias("media_temperatura")
+        )
+
+    resultado = (
+        df.group_by("mes")
+        .agg(aggs)
+        .sort("mes")
+    )
+
+    return resultado.to_dicts()
 
 if __name__ == "__main__":
     pass

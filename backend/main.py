@@ -4,7 +4,8 @@ from fastapi import FastAPI, UploadFile, File, Form
 import polars as pl
 
 from models import RainStats, TemperatureStats, AnalysisResponse
-from processing import analisar_dados_precipitacao, analisar_dados_temperatura, apply_data_mapping
+from processing import analisar_dados_precipitacao, analisar_dados_temperatura, analisar_por_mes
+from processing import apply_data_mapping, filter_data_frame
 
 app = FastAPI(
     title="DataViewer API",
@@ -23,7 +24,7 @@ async def analisar(
     file: UploadFile = File(...),
     mapping: str = Form(...)
 ):
-
+    
     mapping = json.loads(mapping)
 
     content = await file.read()
@@ -31,12 +32,27 @@ async def analisar(
     df = pl.read_csv(BytesIO(content))
 
     df = apply_data_mapping(df, mapping)
+    
+    df = filter_data_frame(df)
 
-    precipitacao_stats = analisar_dados_precipitacao(df)
-    temperatura_stats = analisar_dados_temperatura(df)
+    precipitacao_stats = None
+    temperatura_stats = None 
+    mensal_stats = None
+
+    if "precipitacao" in df.columns:
+        stats = analisar_dados_precipitacao(df)
+        precipitacao_stats = RainStats(**stats)
+    
+    if "temperatura" in df.columns:
+        stats = analisar_dados_temperatura(df)
+        temperatura_stats = TemperatureStats(**stats)
+
+    if "data" in df.columns:
+        mensal_stats = analisar_por_mes(df)
 
     return AnalysisResponse(
         sucesso=True,
-        precipitacao=RainStats(**precipitacao_stats),
-        temperatura=TemperatureStats(**temperatura_stats)
+        precipitacao=precipitacao_stats,
+        temperatura=temperatura_stats,
+        dados_mensais=mensal_stats
     )

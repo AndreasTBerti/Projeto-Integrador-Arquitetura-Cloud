@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class RainStats(BaseModel):
     total_precipitacao: float
     media_precipitacao: float
@@ -16,3 +17,4 @@ class AnalysisResponse(BaseModel):
     sucesso: bool
     precipitacao: RainStats
     temperatura: TemperatureStats
+    dados_mensais: dict
