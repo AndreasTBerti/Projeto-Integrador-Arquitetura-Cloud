@@ -48,9 +48,9 @@ class Frontend():
 
         options = [
             "Ignorar",
-            "Data",
-            "Precipitação",
             "Temperatura Média",
+            "Precipitação",
+            "Data",
         ]
 
         #container para a seleção dos dados para o mapping

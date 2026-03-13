@@ -29,7 +29,11 @@ async def analisar(
 
     content = await file.read()
 
-    df = pl.read_csv(BytesIO(content))
+    df = pl.read_csv(
+        BytesIO(content),
+        separator=",",
+        ignore_errors=True
+    )
 
     df = apply_data_mapping(df, mapping)
     
@@ -39,7 +43,7 @@ async def analisar(
     temperatura_stats = None 
     mensal_stats = None
 
-    if "precipitacao" in df.columns:
+    if "precipitacao_mm" in df.columns:
         stats = analisar_dados_precipitacao(df)
         precipitacao_stats = RainStats(**stats)
     
