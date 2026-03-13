@@ -17,4 +17,4 @@ class AnalysisResponse(BaseModel):
     sucesso: bool
     precipitacao: RainStats
     temperatura: TemperatureStats
-    dados_mensais: dict
+    dados_mensais: list | None = None
