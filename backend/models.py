@@ -18,3 +18,4 @@ class AnalysisResponse(BaseModel):
     precipitacao: RainStats
     temperatura: TemperatureStats
     dados_mensais: list | None = None
+    dados_diarios: list | None = None

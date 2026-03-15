@@ -103,5 +103,30 @@ def analisar_por_mes(df: pl.DataFrame) -> list:
 
     return resultado.to_dicts()
 
+def analisar_por_dia(df: pl.DataFrame) -> list:
+
+    aggs: list = []
+
+    if "precipitacao_mm" in df.columns:
+        aggs.extend([
+            pl.col("precipitacao_mm").sum().alias("precipitacao")
+        ])
+
+    if "temperatura" in df.columns:
+        aggs.append(
+            pl.col("temperatura").mean().alias("temperatura_media")
+        )
+
+    if not aggs:
+        return []
+
+    resultado = (
+        df.group_by("data")
+        .agg(aggs)
+        .sort("data")
+    )
+
+    return resultado.to_dicts()
+
 if __name__ == "__main__":
     pass

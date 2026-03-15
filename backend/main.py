@@ -4,7 +4,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 import polars as pl
 
 from models import RainStats, TemperatureStats, AnalysisResponse
-from processing import analisar_dados_precipitacao, analisar_dados_temperatura, analisar_por_mes
+from processing import analisar_dados_precipitacao, analisar_dados_temperatura, analisar_por_mes, analisar_por_dia
 from processing import apply_data_mapping, filter_data_frame
 
 app = FastAPI(
@@ -53,10 +53,12 @@ async def analisar(
 
     if "data" in df.columns:
         mensal_stats = analisar_por_mes(df)
+        diary_stats = analisar_por_dia(df)
 
     return AnalysisResponse(
         sucesso=True,
         precipitacao=precipitacao_stats,
         temperatura=temperatura_stats,
-        dados_mensais=mensal_stats
+        dados_mensais=mensal_stats,
+        dados_diarios=diary_stats
     )
