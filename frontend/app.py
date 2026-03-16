@@ -203,13 +203,17 @@ class Frontend():
         
         st.subheader("Dados Médios por Mês")
 
-        st.dataframe(df_mensal, row_height=2)
+        st.dataframe(df_mensal)
 
     #função que exibe gráfico com dados diários
     def exibir_grafico_dados_diarios(self, stats):
         dados_diarios = pl.DataFrame(stats)
+
+        df = dados_diarios.with_columns(
+            pl.col("data").str.to_datetime()
+        )
         df = dados_diarios.to_pandas()
-        df['data'] = pl.datetime(df['data'])
+        
 
         st.subheader("Exibição de Dados Diários de Temperatura e Precipitação")
         
