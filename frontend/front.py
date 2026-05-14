@@ -1,6 +1,3 @@
-# app.py
-# Frontend Streamlit para visualização de dados climáticos recebidos da API
-
 import streamlit as st
 import requests
 import pandas as pd
@@ -9,9 +6,6 @@ from datetime import datetime
 import random
 import time
 
-# =========================
-# CONFIGURAÇÃO DA PÁGINA
-# =========================
 
 st.set_page_config(
     page_title="Climate Data Dashboard",
@@ -19,9 +13,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# =========================
-# ESTILO CSS
-# =========================
 
 st.markdown("""
 <style>
@@ -43,22 +34,14 @@ h1 {
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# TÍTULO
-# =========================
 
 st.title("🌦️ Dashboard Climático")
 st.markdown("Monitoramento de sensores climáticos em tempo real")
 
-# =========================
-# CONFIGURAÇÃO API
-# =========================
 
 API_URL = "http://127.0.0.1:8000"
 
-# =========================
-# FUNÇÃO PARA BUSCAR DADOS
-# =========================
+
 
 def get_climate_data():
     """
@@ -80,9 +63,6 @@ def get_climate_data():
 
     return pd.DataFrame(dados)
 
-# =========================
-# SIDEBAR
-# =========================
 
 st.sidebar.header("⚙️ Configurações")
 
@@ -93,9 +73,6 @@ sensor_selecionado = st.sidebar.selectbox(
 
 auto_refresh = st.sidebar.checkbox("Atualização automática")
 
-# =========================
-# CARREGAR DADOS
-# =========================
 
 df = get_climate_data()
 
@@ -103,9 +80,6 @@ df = get_climate_data()
 if sensor_selecionado != "Todos":
     df = df[df["sensor_id"] == sensor_selecionado]
 
-# =========================
-# MÉTRICAS PRINCIPAIS
-# =========================
 
 temperatura_media = round(df["temperatura"].mean(), 2)
 temperatura_max = round(df["temperatura"].max(), 2)
@@ -131,9 +105,7 @@ with col3:
         value=f"{precipitacao_total} mm"
     )
 
-# =========================
-# TABELA DE DADOS
-# =========================
+
 
 st.subheader("📋 Dados Recebidos")
 
@@ -142,9 +114,7 @@ st.dataframe(
     use_container_width=True
 )
 
-# =========================
-# GRÁFICO DE TEMPERATURA
-# =========================
+
 
 st.subheader("📈 Temperatura por Leitura")
 
@@ -159,9 +129,7 @@ fig_temp = px.line(
 
 st.plotly_chart(fig_temp, use_container_width=True)
 
-# =========================
-# GRÁFICO DE PRECIPITAÇÃO
-# =========================
+
 
 st.subheader("🌧️ Precipitação")
 
@@ -175,9 +143,6 @@ fig_prec = px.bar(
 
 st.plotly_chart(fig_prec, use_container_width=True)
 
-# =========================
-# DISTRIBUIÇÃO DE TEMPERATURA
-# =========================
 
 st.subheader("🌡️ Distribuição de Temperatura")
 
@@ -191,9 +156,6 @@ fig_hist = px.histogram(
 
 st.plotly_chart(fig_hist, use_container_width=True)
 
-# =========================
-# ALERTAS
-# =========================
 
 st.subheader("🚨 Alertas Climáticos")
 
@@ -206,9 +168,6 @@ if precipitacao_total > 200:
 if temperatura_media < 20:
     st.info("Temperatura média abaixo de 20°C")
 
-# =========================
-# DOWNLOAD CSV
-# =========================
 
 csv = df.to_csv(index=False).encode("utf-8")
 
@@ -218,10 +177,6 @@ st.download_button(
     file_name="dados_climaticos.csv",
     mime="text/csv"
 )
-
-# =========================
-# AUTO REFRESH
-# =========================
 
 if auto_refresh:
     time.sleep(5)
